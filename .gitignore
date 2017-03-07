@@ -1,0 +1,9 @@
+janet.log
+library.json
+config.json
+game_covers
+
+build
+dist
+
+*.pyc
