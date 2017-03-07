@@ -1,0 +1,201 @@
+*{
+	margin: 0;
+	padding: 0;
+}
+
+*:not(input){
+	user-select: none;
+	-webkit-user-select: none;
+}
+
+ul{
+	list-style: none;
+}
+
+i{
+	width: 1em;
+	display: inline-block;
+	vertical-align: baseline;
+	cursor: pointer;
+}
+
+button{
+	color: #424242;
+	float: left;
+}
+
+html, body{
+	font-family: Quicksand, sans-serif;
+	font-size: 16px;
+	color:#424242;
+	height: 100%;
+	width: 100%;
+}
+
+body{
+	background: -webkit-radial-gradient(center, ellipse cover, #ffffff 0%,#bbdefb 100%);
+	background-size: cover;
+}
+
+/* MENU BAR */
+ul#menu_bar{
+	width: 100%;
+	height: 2em;
+	background: #fff;
+	line-height: 2em;
+	box-shadow: 0 0 .25em rgba(66,66,66,0.75);
+	z-index: 9999;
+	border-bottom: 1px solid rgba(66,66,66,1);
+	position: fixed;
+	top: 0;
+	left: 0;
+}
+
+ul#menu_bar li{
+	cursor: pointer;
+	padding: 0 1em;
+	float: left;
+}
+
+ul#menu_bar li.window_control{
+	float: right;
+}
+
+ul#menu_bar li#close_window{
+	display: none;
+}
+
+ul#menu_bar li:not(.disabled):hover{
+	background-color: #424242;
+	color: #fff;
+}
+
+/* LIBRARY DISPLAY */
+ul#library{
+	text-align: center;
+	padding: 2em 0;
+}
+
+ul#library li.game{
+	display: inline-block;
+	opacity: 0;
+	margin: 2em;
+	position: relative;
+	cursor: pointer;
+	width: 12em;
+	vertical-align: top;
+}
+
+ul#library li.game .img_container{
+	height: 16.875em; /* goofy ratio to meet 768 x 1080 cover art */
+	border-radius: 0.5em;
+	box-shadow: 0 0 1em rgba(66,66,66,0.75);
+	background: url('../images/janet.png') 50% 50% no-repeat rgba(66,66,66,0.75);
+	background-size: 25%;
+}
+
+ul#library li.game img{
+	opacity: 0;
+	height: 100%;
+	width: 100%;
+	border-radius: 0.5em;
+	background: url('../images/janet.png') 50% 50% no-repeat rgba(66,66,66,0.75);
+	background-size: 25%;
+}
+
+ul#library li.game div.title{
+	margin-top: 0.5em;
+	text-transform: capitalize;
+}
+
+ul#library li.game img:hover{
+	box-shadow: 0 0 1em 0.25em #2196F3;
+}
+
+/* OPTIONS PANEL */
+div#options{
+	display: none;
+	width: 100%;
+	max-height: 100%;
+	height: 100%;
+	background: rgba(0,0,0,0.75);
+	margin: 0;
+	padding: 0;
+	position: absolute;
+	top: 0;
+	left: 0;
+	text-align: center;
+}
+
+
+form#options_list{
+	margin: 3em auto;
+	text-align: left;
+	font-size: 1.25em;
+	width: 80%;
+	max-width: 35em;
+}
+
+form#options_list div.row{
+	padding: 1em;
+	text-align: left;
+	margin: 1em auto;
+	overflow: auto;
+	background-color: #fff;
+	color: #424242;
+	border-radius: 0.5em;
+}
+
+form#options_list button{
+	margin: 0 0.5em;
+	border: none;
+	outline: none;
+	background-color: transparent;
+}
+
+form#options_list input{
+	display: inline-block;
+	width: 80%;
+	border-radius: 0.5em;
+	padding: 0.1em 0.5em;
+	border: none;
+	outline: none;
+	font-size: .8em;
+	color: #fff;
+}
+
+div#options span#save_options{
+	float: right;
+	color: #fff;
+	background-color: #388E3C;
+	border-radius: 0.25em;
+	padding: 0.5em;
+	cursor: pointer;
+	box-shadow: 0 0 0.5em rgba(66,66,66,0.75);
+}
+
+div#options span#save_options:hover{
+	background-color: #2E7D32;
+	color: #fff;
+	box-shadow: 0 0 0.5em rgba(66,66,66,0.35);
+}
+
+div#options span#save_options:active{
+	background-color: #1B5E20;
+	box-shadow: none;
+}
+
+
+/* LOADING OVERLAY */
+div#loading{
+	display: none;
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+	background: url('../images/loading.gif') 50% 50% no-repeat rgba(66, 66, 66, 0.75);
+	background-size: 25%
+}
+
+/* WINDOW STYLE */

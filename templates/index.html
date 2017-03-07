@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="cwd" content="{{cwd}}" />
+    <meta name="start_fullscreen" content={{start_fullscreen}} />
+
+    <title>Janet</title>
+
+    <base href="{{cwd}}" />
+    <link rel="stylesheet" href="{{ 'css/style.css'|staticfile }}">
+    <link rel="stylesheet" href="{{ 'css/quicksand.css'|staticfile }}">
+    <link rel="stylesheet" href="{{ 'css/ionicons.css'|staticfile }}">
+    <link rel="stylesheet" href="{{ 'css/toastr.css'|staticfile }}">
+    <script src="{{ 'js/jquery-3.1.1.min.js'|staticfile }}"></script>
+    <script src="{{ 'js/main.js'|staticfile }}"></script>
+    <script src="{{ 'js/library.js'|staticfile }}"></script>
+    <script src="{{ 'js/options.js'|staticfile }}"></script>
+    <script src="{{ 'js/toastr.js'|staticfile }}"></script>
+
+    <script type="text/javascript">
+    toastr.options.positionClass = 'toast-bottom-right';
+    toastr.options.preventDuplicates = false;
+    toastr.options.timeOut = 2000;
+
+    </script>
+
+</head>
+<body>
+    <ul id='menu_bar'>
+        <li id='notif'>
+
+        </li>
+        <li id='options_button'>
+            <i class='icon ion-android-settings'></i>
+            Options
+        </li>
+        <li id='scan_library'>
+            <i class='icon ion-refresh'></i>
+            Re-scan Libary
+        </li>
+        <li class='window_control' id='close_window' >
+            <i class='icon ion-close' title='Close Window'></i>
+        </li>
+        <li class='window_control' id='toggle_fullscreen' >
+            <i class='icon ion-android-contract' title='Toggle Fullscreen Mode'></i>
+        </li>
+
+    </ul>
+    <ul id='library' data-scan="{{scan_on_load}}">
+
+    </ul>
+
+    <div id='options'>
+        <form id='options_list'>
+            <div class='row'>
+                Library Directory:
+                <div>
+                    <input type="file" name="library_directory" data-filemode="directory" value=""/>
+                </div>
+            </div>
+
+            <div class='row'>
+                <i class='icon ion-android-checkbox-outline-blank checkbox' name='scan_on_load' value="false"/></i>
+                Scan library when starting Janet.
+            </div>
+
+            <div class='row'>
+                Path to cemu.exe:
+                <div>
+                    <input type="file" name="cemu_exe" data-filemode="file" data-filter='[{"title": "Cemu Executable", "extensions": "*.exe"}]' value=""/>
+                </div>
+            </div>
+            <div class='row'>
+                <i class='icon ion-android-checkbox-outline-blank checkbox' name='cemu_fullscreen' value="false"/></i>
+                Launch Cemu in fullscreen mode.
+            </div>
+
+            <div class='row'>
+                <i class='icon ion-android-checkbox-outline-blank checkbox' name='start_maximized' value="false"/></i>
+                Start Janet with window maximized.
+            </div>
+
+            <div class='row'>
+                <i class='icon ion-android-checkbox-outline-blank checkbox' name='start_fullscreen' value="false"/></i>
+                Start Janet in fullscreen mode.
+            </div>
+
+            <span id='save_options'>
+                <i class='icon ion-android-checkmark-circle'></i>
+                Save
+            </span>
+        </form>
+
+    </div>
+
+
+    <div id='loading'>
+
+    </div>
+
+</body>
+</html>
