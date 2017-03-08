@@ -79,15 +79,15 @@ ul#library{
 ul#library li.game{
 	display: inline-block;
 	opacity: 0;
-	margin: 2em;
+	margin: 1em;
 	position: relative;
 	cursor: pointer;
-	width: 12em;
+	width: 16em;
 	vertical-align: top;
 }
 
 ul#library li.game .img_container{
-	height: 16.875em; /* goofy ratio to meet 768 x 1080 cover art */
+	height: 9em; /* Ratio with parent li.width to match 640*360 title image */
 	border-radius: 0.5em;
 	box-shadow: 0 0 1em rgba(66,66,66,0.75);
 	background: url('../images/janet.png') 50% 50% no-repeat rgba(66,66,66,0.75);

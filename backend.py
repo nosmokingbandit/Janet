@@ -2,10 +2,10 @@ from lib import htmlPy
 import os
 import json
 import xml.etree.cElementTree as ET
-import urllib2
 import core
 import subprocess
 import threading
+from PIL import Image
 
 import logging
 
@@ -85,7 +85,7 @@ class Options(htmlPy.Object):
             logging.info('Saved config.json')
             return True
         except Exception, e: #noqa
-            logging.error(e)
+            logging.error(str(e), exc_info=True)
             return False
 
 
@@ -102,9 +102,9 @@ class Library(htmlPy.Object):
                 with open(library_json) as f:
                     core.LIBRARY = json.load(f)
 
-        self.cover_dir = os.path.join(cwd, 'game_covers')
-        if not os.path.isdir(self.cover_dir):
-            os.mkdir(self.cover_dir)
+        self.images_dir = os.path.join(cwd, 'game_images')
+        if not os.path.isdir(self.images_dir):
+            os.mkdir(self.images_dir)
 
         return
 
@@ -126,6 +126,8 @@ class Library(htmlPy.Object):
         for i in gamedirs:
             game = {}
 
+            game['directory'] = i
+
             # Parse meta xml for name, game id
             xml = os.path.join(i, 'meta', 'meta.xml')
             try:
@@ -137,7 +139,7 @@ class Library(htmlPy.Object):
                         if elem.tag == 'shortname_en':
                             game['title'] = elem.text.title()
             except Exception, e: #noqa
-                logging.error(e)
+                logging.error(str(e), exc_info=True)
                 continue
 
             # get name of rpx binary
@@ -147,9 +149,10 @@ class Library(htmlPy.Object):
                     break
 
             # get cover image
-            img = os.path.join(self.cover_dir, '{}.jpg'.format(game['game_id']))
+            img = os.path.join(self.images_dir, '{}.jpg'.format(game['game_id']))
             if not os.path.isfile(img):
-                t = threading.Thread(target=self.get_image, args=(game['game_id'], img))
+                self.app.evaluate_javascript('toastr.info("Converting title image for {}")'.format(game['game_id']))
+                t = threading.Thread(target=self.get_image, args=(game,))
                 t.start()
 
             game_data.append(game)
@@ -158,21 +161,23 @@ class Library(htmlPy.Object):
         with open(os.path.join(cwd, 'library.json'), 'w') as f:
             json.dump(game_data, f, indent=2, sort_keys=True)
 
+        self.app.evaluate_javascript('toastr.success("Found {} games")'.format(len(game_data)))
         return json.dumps(game_data)
 
-    def get_image(self, game_id, img):
-        logging.info('Getting cover image for {}.'.format(game_id))
-        url = u'http://art.gametdb.com/wiiu/coverHQ/US/{}.jpg'.format(game_id)
-        request = urllib2.Request(url, headers={'User-Agent': 'Janet'})
+    def get_image(self, game):
+        logging.info('Converting title image for {}.'.format(game['game_id']))
+        title_tga = os.path.join(game['directory'], 'meta', 'bootTvTex.tga')
+        title_jpg = os.path.join(self.images_dir, '{}.jpg'.format(game['game_id']))
+        icon_tga = os.path.join(game['directory'], 'meta', 'iconTex.tga')
+        icon_jpg = os.path.join(self.images_dir, '{}_icon.jpg'.format(game['game_id']))
         try:
-            result = urllib2.urlopen(request).read()
-        except Exception, e: #noqa
-            logging.error(e)
-        try:
-            with open(img, 'wb') as output:
-                output.write(result)
-        except Exception, e: #noqa
-            logging.error(e)
+            title = Image.open(title_tga)
+            title.thumbnail((640, 360))
+            title.save(title_jpg)
+
+            Image.open(icon_tga).save(icon_jpg)
+        except Exception, e:
+            logging.error(str(e), exc_info=True)
         return
 
     @htmlPy.Slot(str, result=bool)
@@ -196,5 +201,6 @@ class Library(htmlPy.Object):
                              )
             return True
         except Exception, e: #noqa
-            logging.error(e)
+            self.app.evaluate_javascript('toastr.error("{}")').format(str(e))
+            logging.error(str(e), exc_info=True)
             return False

@@ -48,7 +48,7 @@ function get_existing_library(){
 function render_library(game_data){
     var $library = $('ul#library');
     $.each(game_data, function(index, game){
-        var li = "<li class='game' title='"+game['title']+"'data-rpx='"+game['binary']+"'><div class='img_container'><img src='file:\\"+cwd+'\\game_covers\\'+game['game_id']+".jpg' onload=ImgLoad(this) onError=ImgError(this) /></div><div class='title'>"+game['title']+"</div></li>"
+        var li = "<li class='game' title='"+game['title']+"'data-rpx='"+game['binary']+"'><div class='img_container'><img src='file:\\"+cwd+'\\game_images\\'+game['game_id']+".jpg' onload=ImgLoad(this) onError=ImgError(this) /></div><div class='title'>"+game['title']+"</div></li>"
         $library.append($(li))
     });
 
