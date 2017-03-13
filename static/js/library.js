@@ -1,65 +1,61 @@
 $(document).ready(function(){
+    // window.$library = $('ul#library'); declared in main.js
     cwd = $('meta[name="cwd"]').attr('content');
+    $title_display = $('div#title_display');
 
-
-    if($('ul#library').attr('data-scan') == 'true'){
+    if($('ul#library').attr('scan') == 'true'){
         scan_library();
     } else {
-        get_existing_library();
+        Janet.get_library();
     }
 
     $('li#scan_library').click(scan_library);
 
-    // Launch a title
-    $('li.game').click(function(){
-        var rpx = $(this).attr('data-rpx');
-        if(Library.launch_game(rpx)){
-            toastr.success('Launched '+rpx+'.')
-        } else {
-            toastr.error('Something went horribly wrong.')
-        }
-    });
 });
 
 
 function scan_library(){
-    var $library = $('ul#library');
-    $library.find('li').fadeOut(500, function(li){$(li).remove()})
+    $library.find('li').fadeOut(500, function(li){$library.empty()})
     $('div#loading').fadeIn(500, function(){
-        game_data = JSON.parse(Library.scan());
-
-        game_data_interval = setInterval(wait_for_game_data, 1000);
+        Janet.scan_library();
     });
-}
-
-function wait_for_game_data() {
-        if (game_data !== undefined) {
-        clearInterval(game_data_interval)
-        render_library(game_data)
-    }
-}
-
-function get_existing_library(){
-    if((game_data = JSON.parse(Library.get_library())) !== ""){
-        render_library(game_data)
-    }
 }
 
 function render_library(game_data){
-    var $library = $('ul#library');
     $.each(game_data, function(index, game){
-        var li = "<li class='game' title='"+game['title']+"'data-rpx='"+game['binary']+"'><div class='img_container'><img src='file:\\"+cwd+'\\game_images\\'+game['game_id']+".jpg' onload=ImgLoad(this) onError=ImgError(this) /></div><div class='title'>"+game['title']+"</div></li>"
+        var li = `
+            <li class='game' rpx='${game["binary"]}' onClick='launch_game(this)'>
+                <div class='img_container'>
+                    <img src='file:\\${cwd}\\game_images\\${game['game_id']}.jpg' onload=ImgLoad(this) onError=ImgError(this) class='banner'/>
+                    <img src='file:\\${cwd}\\game_images\\${game['game_id']}_icon.jpg' onload=ImgLoad(this) onError=ImgError(this) class='icon'/>
+                </div>
+                <span class='tooltiptext'>${game["title"]}</span>
+            </li>`
         $library.append($(li))
+
     });
 
-    $('div#loading').fadeOut();
+    window.$ligames = $('li.game')
+    $ligames.each(function(i, li){
+        if($library.hasClass('banner')){
+            $(li).find('img.banner').show();
+        } else {
+            $(li).find('img.icon').show();
+        }
 
-    $('li.game').each(function(i, li){
+
         setTimeout(function(){
             $(li).animate({opacity: 1})
         }, 100 * i)
 
     });
+
+    $('div#loading').fadeOut();
+}
+
+
+function launch_game(elem){
+    Janet.launch_game($(elem).attr('rpx'))
 }
 
 function ImgError(image) {
@@ -82,5 +78,11 @@ function ImgError(image) {
 }
 
 function ImgLoad(image){
-    $(image).animate({opacity: 1})
+    $image = $(image);
+    if($library.hasClass('banner') && !$image.hasClass('banner')){
+        $image.attr('style', '')
+    } else if($library.hasClass('icon') && !$image.hasClass('icon')){
+        $image.attr('style', '')
+    }
+
 }

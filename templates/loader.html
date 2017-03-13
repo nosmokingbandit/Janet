@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Janet</title>
+        <script>
+
+            function loadindex(html){
+                document.open();
+                document.write(html);
+                document.close();
+
+            }
+
+            function ready(fn) {
+              if (document.readyState != 'loading'){
+                fn();
+              } else {
+                document.addEventListener('DOMContentLoaded', fn);
+              }
+            }
+
+            ready(function(){
+                Janet.loadindex()
+            })
+
+
+
+
+        </script>
+
+    </head>
+    <body>
+        <button type="button" name="button" onClick="testfunc()">TEST</button>
+    </body>
+</html>

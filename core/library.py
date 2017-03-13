@@ -1,104 +1,25 @@
-from lib import htmlPy
+import logging
 import os
 import json
-import xml.etree.cElementTree as ET
 import core
+import xml.etree.cElementTree as ET
 import subprocess
 import threading
 from PIL import Image
 
-import logging
-
 cwd = os.getcwd()
 
 
-class BackEnd(htmlPy.Object):
-
-    def __init__(self, app):
-        super(BackEnd, self).__init__()
-        self.app = app
-
-
-class Gui(htmlPy.Object):
-    def __init__(self, app):
-        super(Gui, self).__init__()
-        self.app = app
-        return
-
-    @htmlPy.Slot()
-    def toggle_fullscreen(self):
-        if self.app.window.isFullScreen():
-            self.app.window.showNormal()
-        else:
-            self.app.window.showFullScreen()
-
-    @htmlPy.Slot()
-    def close_window(self):
-        self.app.window.close()
-
-
-class Options(htmlPy.Object):
-    logging = logging.getLogger("Options")
-
-    def __init__(self, app):
-        super(Options, self).__init__()
-        self.app = app
-
-        self.config_template = {"library_directory": "",
-                                "cemu_exe": "",
-                                "scan_on_load": "false",
-                                "start_maximized": "false",
-                                "start_fullscreen": "false",
-                                "cemu_fullscreen": "false"
-                                }
-        self.config_path = os.path.join(cwd, 'config.json')
-        core.CONFIG = self.open_config()
-        return
-
-    def open_config(self):
-        if not os.path.isfile(self.config_path):
-            logging.info('Creating new config file.')
-            self.write_config(json.dumps(self.config_template))
-            return self.config_template
-        else:
-            logging.info('Found config file.')
-            with open(self.config_path, 'r') as f:
-                config = json.load(f)
-            return config
-
-    @htmlPy.Slot(result=str)
-    def get_config(self):
-        return json.dumps(core.CONFIG)
-
-    @htmlPy.Slot(str)
-    def log(self, x):
-        print x
-        logging.info(x)
-
-    @htmlPy.Slot(str, result=bool)
-    def write_config(self, config):
-        conf = json.loads(config)
-        try:
-            with open(self.config_path, 'w+') as f:
-                json.dump(conf, f, indent=2)
-            core.CONFIG = conf
-            logging.info('Saved config.json')
-            return True
-        except Exception, e: #noqa
-            logging.error(str(e), exc_info=True)
-            return False
-
-
-class Library(htmlPy.Object):
+class Library(object):
     logging = logging.getLogger("Library")
 
-    def __init__(self, app):
-        super(Library, self).__init__()
-        self.app = app
+    def __init__(self):
         if core.CONFIG.get('library_directory'):
             library_json = os.path.join(cwd, 'library.json')
             if os.path.isfile(library_json):
-                logging.info('Found existing library.')
+                logging.info('Loaded existing library:')
+                logging.info(library_json)
+                print library_json
                 with open(library_json) as f:
                     core.LIBRARY = json.load(f)
 
@@ -108,17 +29,12 @@ class Library(htmlPy.Object):
 
         return
 
-    @htmlPy.Slot(result=str)
-    def get_library(self):
-        if core.LIBRARY:
-            return json.dumps(core.LIBRARY)
-        else:
-            return "[]"
-
-    @htmlPy.Slot(result=str)
     def scan(self):
         logging.info('Scanning library.')
         library_dir = core.CONFIG['library_directory']
+
+        if not os.path.isdir(library_dir):
+            return
 
         game_data = []
         gamedirs = [os.path.join(library_dir, i) for i in os.listdir(library_dir) if os.path.isdir(os.path.join(library_dir, i))]
@@ -151,7 +67,6 @@ class Library(htmlPy.Object):
             # get cover image
             img = os.path.join(self.images_dir, '{}.jpg'.format(game['game_id']))
             if not os.path.isfile(img):
-                self.app.evaluate_javascript('toastr.info("Converting title image for {}")'.format(game['game_id']))
                 t = threading.Thread(target=self.get_image, args=(game,))
                 t.start()
 
@@ -161,8 +76,7 @@ class Library(htmlPy.Object):
         with open(os.path.join(cwd, 'library.json'), 'w') as f:
             json.dump(game_data, f, indent=2, sort_keys=True)
 
-        self.app.evaluate_javascript('toastr.success("Found {} games")'.format(len(game_data)))
-        return json.dumps(game_data)
+        return game_data
 
     def get_image(self, game):
         logging.info('Converting title image for {}.'.format(game['game_id']))
@@ -180,7 +94,6 @@ class Library(htmlPy.Object):
             logging.error(str(e), exc_info=True)
         return
 
-    @htmlPy.Slot(str, result=bool)
     def launch_game(self, rpx):
         # "programs\cemu.exe" -g "Title\code\title.rpx" -f
         cemu = core.CONFIG['cemu_exe']
@@ -199,8 +112,7 @@ class Library(htmlPy.Object):
                              stderr=subprocess.STDOUT,
                              shell=False
                              )
-            return True
+            return None
         except Exception, e: #noqa
-            self.app.evaluate_javascript('toastr.error("{}")').format(str(e))
             logging.error(str(e), exc_info=True)
-            return False
+            return str(e)
